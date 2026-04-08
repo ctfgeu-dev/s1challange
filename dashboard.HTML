@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS :: DASHBOARD</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --green:  #00ff88;
+            --dim:    #00aa55;
+            --dark:   #030d07;
+            --panel:  #040f08;
+            --border: #0a3a1a;
+            --amber:  #ffaa00;
+            --blue:   #00aaff;
+        }
+
+        body {
+            background: var(--dark);
+            color: var(--green);
+            font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,255,136,0.012) 2px,
+                rgba(0,255,136,0.012) 4px
+            );
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* ===== TOP NAV ===== */
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            height: 52px;
+            background: #020a04;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .nav-logo {
+            font-family: 'Orbitron', monospace;
+            font-weight: 900;
+            font-size: 1.1rem;
+            letter-spacing: 0.3em;
+            color: var(--green);
+            text-shadow: 0 0 14px rgba(0,255,136,0.5);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            font-size: 0.68rem;
+            color: var(--dim);
+        }
+
+        .nav-user {
+            color: var(--green);
+            letter-spacing: 0.1em;
+        }
+
+        .nav-user::before { content: '[ '; }
+        .nav-user::after  { content: ' ]'; }
+
+        .nav-logout {
+            color: #ff6644;
+            text-decoration: none;
+            letter-spacing: 0.1em;
+            border: 1px solid rgba(255,100,68,0.3);
+            padding: 3px 10px;
+            transition: background 0.15s;
+        }
+
+        .nav-logout:hover { background: rgba(255,100,68,0.1); }
+
+        /* ===== MAIN LAYOUT ===== */
+        .main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        .page-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8rem;
+            letter-spacing: 0.3em;
+            color: var(--dim);
+            margin-bottom: 28px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .page-title span {
+            color: var(--green);
+        }
+
+        /* ===== STAT CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            padding: 20px 18px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 2px;
+            background: var(--green);
+            opacity: 0.3;
+        }
+
+        .stat-card.amber::after { background: var(--amber); }
+        .stat-card.blue::after  { background: var(--blue); }
+        .stat-card.red::after   { background: #ff4444; }
+
+        .stat-label {
+            font-size: 0.62rem;
+            letter-spacing: 0.15em;
+            color: var(--dim);
+            margin-bottom: 10px;
+        }
+
+        .stat-val {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--green);
+        }
+
+        .stat-card.amber .stat-val { color: var(--amber); }
+        .stat-card.blue  .stat-val { color: var(--blue); }
+        .stat-card.red   .stat-val { color: #ff4444; }
+
+        .stat-sub {
+            font-size: 0.62rem;
+            color: #1a4a2a;
+            margin-top: 6px;
+        }
+
+        /* ===== PANELS ===== */
+        .panels-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .panel-box {
+            background: var(--panel);
+            border: 1px solid var(--border);
+        }
+
+        .panel-box-header {
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            color: var(--dim);
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge {
+            background: rgba(0,255,136,0.1);
+            border: 1px solid rgba(0,255,136,0.2);
+            color: var(--green);
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            letter-spacing: 0.1em;
+        }
+
+        .badge.amber {
+            background: rgba(255,170,0,0.1);
+            border-color: rgba(255,170,0,0.25);
+            color: var(--amber);
+        }
+
+        .panel-body { padding: 16px; }
+
+        /* Log stream */
+        .log-stream { display: flex; flex-direction: column; gap: 6px; }
+
+        .log-entry {
+            font-size: 0.72rem;
+            display: flex;
+            gap: 12px;
+            padding: 5px 0;
+            border-bottom: 1px solid #040f08;
+        }
+
+        .log-time { color: #1a5a30; min-width: 72px; }
+        .log-level { min-width: 50px; }
+        .log-level.ok   { color: var(--green); }
+        .log-level.warn { color: var(--amber); }
+        .log-level.info { color: var(--blue); }
+        .log-msg  { color: #6a9a7a; flex: 1; }
+
+        /* System info list */
+        .info-list { display: flex; flex-direction: column; gap: 0; }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            padding: 9px 0;
+            border-bottom: 1px solid #040f08;
+        }
+
+        .info-key { color: var(--dim); }
+        .info-val { color: var(--green); }
+        .info-val.amber { color: var(--amber); }
+
+        /* ===== COMMAND TERMINAL WIDGET ===== */
+        .terminal-widget {
+            background: #010805;
+            border: 1px solid var(--border);
+            padding: 0;
+            margin-bottom: 20px;
+        }
+
+        .terminal-titlebar {
+            background: #020a04;
+            border-bottom: 1px solid var(--border);
+            padding: 7px 14px;
+            font-size: 0.62rem;
+            color: var(--dim);
+            letter-spacing: 0.15em;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .term-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .term-dot.r { background: #ff5f57; }
+        .term-dot.y { background: #ffbd2e; }
+        .term-dot.g { background: #28ca41; }
+
+        .terminal-body {
+            padding: 14px 16px;
+            font-size: 0.75rem;
+            line-height: 1.8;
+            color: #4aaa6a;
+        }
+
+        .terminal-body .cmd { color: var(--green); }
+        .terminal-body .out { color: #2a7a4a; }
+        .terminal-body .hi  { color: var(--amber); }
+
+        .cursor-blink {
+            display: inline-block;
+            width: 8px;
+            height: 14px;
+            background: var(--green);
+            vertical-align: middle;
+            animation: blink 1s step-end infinite;
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<!--
+    =====================================================
+    INTERNAL DIAGNOSTIC NOTE — DO NOT REMOVE
+    System health check endpoint: /api/status
+    Monitors build integrity and service references.
+    Encoding used: base64 (standard)
+    =====================================================
+-->
+
+<nav>
+    <div class="nav-logo">NEXUS</div>
+    <div class="nav-right">
+        <span>SESSION ACTIVE</span>
+        <span class="nav-user">{{ user }}</span>
+        <a class="nav-logout" href="/logout">LOGOUT</a>
+    </div>
+</nav>
+
+<div class="main">
+    <div class="page-title">
+        // OPERATOR DASHBOARD &nbsp;&gt;&gt;&gt;&nbsp; <span>CLEARANCE LEVEL: ALPHA</span>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">// ACTIVE NODES</div>
+            <div class="stat-val">247</div>
+            <div class="stat-sub">+12 from last cycle</div>
+        </div>
+        <div class="stat-card amber">
+            <div class="stat-label">// ALERTS</div>
+            <div class="stat-val">03</div>
+            <div class="stat-sub">2 pending review</div>
+        </div>
+        <div class="stat-card blue">
+            <div class="stat-label">// DATA PACKETS</div>
+            <div class="stat-val">19K</div>
+            <div class="stat-sub">Encrypted transit</div>
+        </div>
+        <div class="stat-card red">
+            <div class="stat-label">// INTRUSIONS</div>
+            <div class="stat-val">00</div>
+            <div class="stat-sub">System secure</div>
+        </div>
+    </div>
+
+    <div class="panels-row">
+        <div class="panel-box">
+            <div class="panel-box-header">
+                <span>// SYSTEM EVENT LOG</span>
+                <span class="badge">LIVE</span>
+            </div>
+            <div class="panel-body">
+                <div class="log-stream">
+                    <div class="log-entry">
+                        <span class="log-time">08:14:02</span>
+                        <span class="log-level ok">[OK]</span>
+                        <span class="log-msg">Auth subsystem initialized</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-time">08:14:05</span>
+                        <span class="log-level info">[INFO]</span>
+                        <span class="log-msg">Operator session established</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-time">08:15:11</span>
+                        <span class="log-level warn">[WARN]</span>
+                        <span class="log-msg">Unusual login pattern detected — flagged</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-time">08:15:12</span>
+                        <span class="log-level ok">[OK]</span>
+                        <span class="log-msg">Credential validation passed (bypass path)</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-time">08:16:00</span>
+                        <span class="log-level info">[INFO]</span>
+                        <span class="log-msg">API gateway operational — endpoints registered</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-time">08:17:44</span>
+                        <span class="log-level warn">[WARN]</span>
+                        <span class="log-msg">Secret store access: 1 pending retrieval</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-time">08:18:01</span>
+                        <span class="log-level ok">[OK]</span>
+                        <span class="log-msg">All systems nominal</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-box">
+            <div class="panel-box-header">
+                <span>// SYSTEM INFO</span>
+                <span class="badge amber">CLASSIFIED</span>
+            </div>
+            <div class="panel-body">
+                <div class="info-list">
+                    <div class="info-row">
+                        <span class="info-key">BUILD</span>
+                        <span class="info-val">prod-2024</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-key">VERSION</span>
+                        <span class="info-val">1.0.4</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-key">STORAGE</span>
+                        <span class="info-val">file-based</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-key">ENCRYPTION</span>
+                        <span class="info-val amber">multi-layer</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-key">SECRET STORE</span>
+                        <span class="info-val amber">SEALED</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-key">API STATUS</span>
+                        <span class="info-val">OPERATIONAL</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="terminal-widget">
+        <div class="terminal-titlebar">
+            <span class="term-dot r"></span>
+            <span class="term-dot y"></span>
+            <span class="term-dot g"></span>
+            <span style="margin-left:8px;">nexus-shell v0.9 — operator terminal</span>
+        </div>
+        <div class="terminal-body">
+            <div class="cmd">&gt; whoami</div>
+            <div class="out">{{ user }} :: role=operator :: clearance=alpha</div>
+            <br>
+            <div class="cmd">&gt; status</div>
+            <div class="out">All subsystems online. Secret archive: <span class="hi">LOCKED</span></div>
+            <br>
+            <div class="cmd">&gt; hint</div>
+            <div class="out">Diagnostics available. Check the page source — the system leaves breadcrumbs.</div>
+            <br>
+            <div class="cmd">&gt; _<span class="cursor-blink"></span></div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
